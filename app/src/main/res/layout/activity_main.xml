@@ -4,18 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="5dp"
     tools:context="com.karan.labeldetection.MainActivity">
     <Button
-        android:text="capture"
+        android:text="take picture"
+        android:theme="@style/MyButton"
         android:layout_centerInParent="true"
         android:id="@+id/capture"
-        android:layout_width="wrap_content"
+        android:textColor="#fff"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
-        android:text="select"
+        android:theme="@style/MyButton"
+        android:textColor="#fff"
+        android:layout_width="match_parent"
+
+        android:text="select from gallery"
         android:layout_centerInParent="true"
         android:layout_below="@+id/capture"
         android:id="@+id/select"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </RelativeLayout>
