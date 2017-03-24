@@ -7,6 +7,7 @@
     android:padding="5dp"
     tools:context="com.karan.labeldetection.MainActivity">
     <Button
+        android:drawableEnd="@drawable/ic_camera_white_36dp"
         android:text="take picture"
         android:theme="@style/MyButton"
         android:layout_centerInParent="true"
@@ -18,7 +19,7 @@
         android:theme="@style/MyButton"
         android:textColor="#fff"
         android:layout_width="match_parent"
-
+        android:drawableEnd="@drawable/ic_perm_media_white_36dp"
         android:text="select from gallery"
         android:layout_centerInParent="true"
         android:layout_below="@+id/capture"

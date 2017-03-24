@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 2;
     private static final int MULTIPLE_PERMISSIONS = 123;
     private static final int REQUEST_TAKE_PHOTO = 5;
-    private  final String TAG = MainActivity.this.getPackageName();
     String mCurrentPhotoPath;
 
 
@@ -58,17 +58,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Intent intent=new Intent(this,ImageActivity.class);
         if (requestCode == PICK_IMAGE_REQUEST &&
                 resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             Uri uri = data.getData();
-            Intent intent = new Intent(this,ImageActivity.class);
             intent.putExtra("data",uri);
             startActivity(intent);
         }
-        else if(requestCode == CAMERA_REQUEST &&
-                resultCode == RESULT_OK &&data!=null && data.getData() !=null){
-            Log.d("file name",mCurrentPhotoPath);
+        else if(requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK ){
+            Uri uri=Uri.fromFile(new File(mCurrentPhotoPath));
+            intent.putExtra("data",uri);
+            startActivity(intent);
         }
     }
     private void checkForPermissions() {
@@ -160,24 +161,24 @@ public class MainActivity extends AppCompatActivity {
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photoFile = null;
+            File photoFile;
 
                 photoFile = getOutputMediaFile();
 
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.karan.labeldetection.fileprovider",
-                        photoFile);
+                Uri photoURI =
+                        FileProvider.getUriForFile(this,
+                                getApplicationContext().getPackageName() + ".provider", photoFile);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
     }
-    private File getOutputMediaFile() {
-        File mediaStorageDir =new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                "Camera");
+    private File getOutputMediaFile()  {
+        File mediaStorageDir =Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
@@ -191,7 +192,28 @@ public class MainActivity extends AppCompatActivity {
 
         File mediaFile;
         mediaFile = new File(fileName);
-        mCurrentPhotoPath = mediaFile.getAbsolutePath();
+        try {
+            if(mediaFile.createNewFile()){
+                Log.d("FILE","Created");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        String imageFileName = "JPEG_" + timeStamp + "_";
+//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File image = null;
+//        try {
+//            image = File.createTempFile(
+//                    imageFileName,  /* prefix */
+//                    ".jpg",         /* suffix */
+//                    storageDir      /* directory */
+//            );
+//            mCurrentPhotoPath = image.getAbsolutePath();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         return mediaFile;
     }

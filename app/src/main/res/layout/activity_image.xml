@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
-    android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
-    tools:context="com.karan.labeldetection.ImageActivity">
+   >
+
     <ImageView
-        android:layout_weight="7"
+        android:layout_weight="5"
         android:id="@+id/image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"/>
-    <GridView
-        android:stretchMode="columnWidth"
-        android:numColumns="4"
-        android:layout_weight="3"
-        android:id="@+id/gridView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
+    <TextView
+        android:text="SELECT ALL"
+        android:layout_gravity="end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#8C000000"
+        android:id="@+id/select"
+        />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_weight="4"
+        android:layout_height="0dp"
+        android:layout_width="wrap_content"/>
+    <LinearLayout
+        android:gravity="end"
+        android:id="@+id/buttonPanel"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+        <Button
+            android:id="@+id/cancel"
+            android:text="CANCEL"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/share"
+            android:textColor="#004D40"
+            android:text="SHARE"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 </LinearLayout>
+
