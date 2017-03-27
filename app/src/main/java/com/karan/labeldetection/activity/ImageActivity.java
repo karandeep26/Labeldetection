@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.bumptech.glide.Glide;
@@ -218,6 +219,9 @@ public class ImageActivity extends Activity {
                         (dialog, which) -> createInstagramIntent("image/*"));
                 alertDialog.setCancelable(false);
                 alertDialog.show();
+            }
+            else{
+                Toast.makeText(this,"Instagram not installed",Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
