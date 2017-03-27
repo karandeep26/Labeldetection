@@ -1,4 +1,4 @@
-package com.karan.labeldetection;
+package com.karan.labeldetection.model;
 
 /**
  * Created by stpl on 3/24/2017.

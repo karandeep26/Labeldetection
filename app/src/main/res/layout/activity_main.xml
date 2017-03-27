@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
-    tools:context="com.karan.labeldetection.MainActivity">
+    tools:context="com.karan.labeldetection.activity.MainActivity">
     <Button
         android:drawableEnd="@drawable/ic_camera_white_36dp"
         android:text="take picture"

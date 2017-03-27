@@ -1,4 +1,6 @@
-package com.karan.labeldetection;
+package com.karan.labeldetection.network;
+
+import com.karan.labeldetection.model.JsonResponse;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;

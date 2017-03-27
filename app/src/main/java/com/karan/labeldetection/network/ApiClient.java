@@ -1,4 +1,4 @@
-package com.karan.labeldetection;
+package com.karan.labeldetection.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

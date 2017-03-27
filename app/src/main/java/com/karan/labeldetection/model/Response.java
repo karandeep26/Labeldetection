@@ -1,4 +1,4 @@
-package com.karan.labeldetection;
+package com.karan.labeldetection.model;
 
 import java.util.ArrayList;
 

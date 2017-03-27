@@ -1,10 +1,11 @@
-package com.karan.labeldetection;
+package com.karan.labeldetection.activity;
 
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -16,6 +17,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.karan.labeldetection.AlertDialogManager;
+import com.karan.labeldetection.BuildConfig;
+import com.karan.labeldetection.ConnectionDetector;
+import com.karan.labeldetection.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,23 +40,30 @@ public class MainActivity extends AppCompatActivity {
     private static final int MULTIPLE_PERMISSIONS = 123;
     private static final int REQUEST_TAKE_PHOTO = 5;
     String mCurrentPhotoPath;
-
+    ConnectionDetector connectionDetector;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button capture,select;
-        capture= (Button) findViewById(R.id.capture);
-        select= (Button) findViewById(R.id.select);
+        connectionDetector=new ConnectionDetector(this);
+        if(!connectionDetector.isConnectingToInternet()){
+            AlertDialogManager alertDialogManager=new AlertDialogManager();
+            alertDialogManager.showAlertDialog(this,"Connectivity Problem","Not Connected to Internet",false);
+            return;
+        }
+        Button capture, select;
+        capture = (Button) findViewById(R.id.capture);
+        select = (Button) findViewById(R.id.select);
         select.setOnClickListener(v -> {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"),
+                    PICK_IMAGE_REQUEST);
         });
-        capture.setOnClickListener(v-> checkForPermissions());
+        capture.setOnClickListener(v -> checkForPermissions());
 
     }
 
@@ -58,20 +71,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Intent intent=new Intent(this,ImageActivity.class);
+        Intent intent = new Intent(this, ImageActivity.class);
         if (requestCode == PICK_IMAGE_REQUEST &&
                 resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             Uri uri = data.getData();
-            intent.putExtra("data",uri);
+            intent.putExtra("data", uri);
             startActivity(intent);
-        }
-        else if(requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK ){
-            Uri uri=Uri.fromFile(new File(mCurrentPhotoPath));
-            intent.putExtra("data",uri);
+        } else if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            galleryAddPic();
+            Uri uri = Uri.fromFile(new File(mCurrentPhotoPath));
+            Log.d("TAG", "file exist" + new File(mCurrentPhotoPath).length());
+            intent.putExtra("data", uri);
+
             startActivity(intent);
         }
     }
+
     private void checkForPermissions() {
         ArrayList<String> permissionNeeded = new ArrayList<>();
         ArrayList<String> permissionList = new ArrayList<>();
@@ -83,12 +99,13 @@ public class MainActivity extends AppCompatActivity {
             permissionNeeded.add("read");
 
         if (permissionNeeded.size() > 0) {
-            permissionNotAvailable(permissionNeeded,permissionList);
+            permissionNotAvailable(permissionNeeded, permissionList);
         } else {
             dispatchTakePictureIntent();
         }
 
     }
+
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager
                 .PERMISSION_GRANTED) {
@@ -99,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(MainActivity.this)
                 .setMessage(message)
@@ -107,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+
     public void permissionNotAvailable(ArrayList<String> permissionNeeded,
                                        ArrayList<String> permissionList) {
         String message = "You need to grant access to " + permissionNeeded.get(0);
@@ -156,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -163,13 +183,18 @@ public class MainActivity extends AppCompatActivity {
             // Create the File where the photo should go
             File photoFile;
 
-                photoFile = getOutputMediaFile();
+            photoFile = getOutputMediaFile();
 
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI =
-                        FileProvider.getUriForFile(this,
-                                getApplicationContext().getPackageName() + ".provider", photoFile);
+                Uri photoURI;
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                    photoURI =
+                            Uri.fromFile(photoFile);
+                } else {
+                    photoURI = FileProvider.getUriForFile(this,
+                            BuildConfig.APPLICATION_ID + ".provider", photoFile);
+                }
                 takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
@@ -177,8 +202,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private File getOutputMediaFile()  {
-        File mediaStorageDir =Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+    private File getOutputMediaFile() {
+        File mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment
+                .DIRECTORY_DCIM);
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
@@ -193,28 +220,23 @@ public class MainActivity extends AppCompatActivity {
         File mediaFile;
         mediaFile = new File(fileName);
         try {
-            if(mediaFile.createNewFile()){
-                Log.d("FILE","Created");
+            if (mediaFile.createNewFile()) {
+                mCurrentPhotoPath = mediaFile.getAbsolutePath();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = null;
-//        try {
-//            image = File.createTempFile(
-//                    imageFileName,  /* prefix */
-//                    ".jpg",         /* suffix */
-//                    storageDir      /* directory */
-//            );
-//            mCurrentPhotoPath = image.getAbsolutePath();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
 
         return mediaFile;
     }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
 }

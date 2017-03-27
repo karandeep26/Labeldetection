@@ -1,4 +1,4 @@
-package com.karan.labeldetection;
+package com.karan.labeldetection.adapter;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.karan.labeldetection.R;
+import com.karan.labeldetection.model.Model;
 
 import java.util.ArrayList;
 
@@ -17,7 +20,7 @@ import java.util.ArrayList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private ArrayList<Model> data;
     private Context mContext;
-    RecyclerViewAdapter(ArrayList<Model> data, Context context) {
+    public RecyclerViewAdapter(ArrayList<Model> data, Context context) {
         this.data = data;
         mContext=context;
 
